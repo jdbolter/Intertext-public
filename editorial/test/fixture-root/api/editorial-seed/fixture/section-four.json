@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "workId": "fixture",
+  "sectionId": "section-four",
+  "sectionOrder": 4,
+  "title": "Section Four",
+  "editionId": "fixture",
+  "versionId": "section-four-v001",
+  "parentVersionId": null,
+  "createdAt": "2026-09-22T00:00:00Z",
+  "source": {
+    "type": "authored",
+    "path": "example/source_texts/sections/section-4.md"
+  },
+  "spine": [
+    {
+      "id": "section-four-p01",
+      "markdown": "Synthetic passage 1 of section four. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-four-p02",
+      "markdown": "Synthetic passage 2 of section four. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-four-p03",
+      "markdown": "Synthetic passage 3 of section four. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-four-p04",
+      "markdown": "Synthetic passage 4 of section four. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-four-p05",
+      "markdown": "Synthetic passage 5 of section four. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-four-p06",
+      "markdown": "Synthetic passage 6 of section four. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-four-p07",
+      "markdown": "Synthetic passage 7 of section four. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    }
+  ],
+  "fundEntries": [],
+  "changeSummary": "Frozen synthetic package used only by the tests."
+}

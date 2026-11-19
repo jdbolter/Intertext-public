@@ -1,0 +1,162 @@
+'use strict';
+
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const path = require('path');
+
+const {
+  EDITORIAL_DELIVERY_TOOL,
+  buildEditorialDeliveryTool,
+  extractEditorialDelivery,
+  formatPriorSectionSummaries,
+  isEditorialEdition,
+  loadEditorialSection,
+  normalizePriorSectionSummaries,
+  prepareEditorialReading,
+  prepareVersionedReading,
+} = require('../../api/_lib/editorial-reading');
+
+// A frozen set of packaged sections (see fixture-root/README.md).
+const ROOT = path.join(__dirname, 'fixture-root');
+
+test('recognizes only the two local editorial experiment editions', () => {
+  assert.equal(isEditorialEdition('editorial-spine'), true);
+  assert.equal(isEditorialEdition('editorial-fund'), true);
+  assert.equal(isEditorialEdition('original'), false);
+});
+
+test('loads every fixture package by stable section order', () => {
+  const expected = [
+    ['section-one', 4, 0],
+    ['section-two', 8, 0],
+    ['section-three', 2, 0],
+    ['section-four', 7, 0],
+    ['section-five', 10, 4],
+  ];
+  expected.forEach(([sectionId, passageCount, fundCount], sectionIndex) => {
+    const section = loadEditorialSection({ rootDir: ROOT, textId: 'fixture', sectionIndex });
+    assert.equal(section.sectionId, sectionId);
+    assert.equal(section.spine.length, passageCount);
+    assert.equal(section.fundEntries.length, fundCount);
+  });
+});
+
+test('spine condition supplies no fund while preserving passage markers', () => {
+  const reading = prepareEditorialReading({
+    rootDir: ROOT,
+    textId: 'fixture',
+    sectionIndex: 4,
+    edition: 'editorial-spine',
+  });
+  assert.equal(reading.fundText, null);
+  assert.deepEqual(reading.offeredFundEntryIds, []);
+  assert.match(reading.sectionText, /intertext:passage section-five-p01/);
+  assert.match(reading.instructions, /spine-only condition/);
+});
+
+test('fund condition offers candidates once and records already-presented entries', () => {
+  const reading = prepareEditorialReading({
+    rootDir: ROOT,
+    textId: 'fixture',
+    sectionIndex: 4,
+    edition: 'editorial-fund',
+    presentedFundEntryIds: ['entry-one', 'unknown-entry'],
+  });
+  assert.deepEqual(reading.alreadyPresentedFundEntryIds, ['entry-one']);
+  assert.equal(reading.offeredFundEntryIds.includes('entry-one'), false);
+  assert.equal(reading.offeredFundEntryIds.length, 3);
+  assert.doesNotMatch(reading.fundText, /<fund_entry id="entry-one"/);
+  assert.match(reading.fundText, /<fund_entry id="entry-two"/);
+});
+
+test('a candidate that presupposes a passage is anchored after it', () => {
+  const section = loadEditorialSection({ rootDir: ROOT, textId: 'fixture', sectionIndex: 4 });
+  const entry = section.fundEntries.find(candidate => candidate.id === 'entry-one');
+  assert.deepEqual(entry.anchors, ['section-five-p02']);
+});
+
+test('required delivery tool constrains use reports to entries actually offered', () => {
+  const tool = buildEditorialDeliveryTool(['entry-one']);
+  assert.equal(tool.name, EDITORIAL_DELIVERY_TOOL);
+  assert.deepEqual(
+    tool.input_schema.properties.usedFundEntryIds.items.enum,
+    ['entry-one']
+  );
+
+  const parsed = extractEditorialDelivery([{
+    type: 'tool_use',
+    name: EDITORIAL_DELIVERY_TOOL,
+    input: {
+      response: 'Visible prose.',
+      usedFundEntryIds: ['entry-one'],
+      sectionComplete: false,
+      sectionSummary: 'The reader is testing how plural standards replace a single hierarchy.',
+    },
+  }], ['entry-one']);
+  assert.equal(parsed.text, 'Visible prose.');
+  assert.deepEqual(parsed.usedFundEntryIds, ['entry-one']);
+  assert.equal(parsed.trackingComplete, true);
+  assert.equal(parsed.sectionComplete, false);
+  assert.match(parsed.sectionSummary, /plural standards/);
+});
+
+test('delivery extraction rejects a missing call or an entry that was not offered', () => {
+  assert.throws(() => extractEditorialDelivery([], ['entry']), /Expected exactly one/);
+  assert.throws(
+    () => extractEditorialDelivery([{
+      type: 'tool_use',
+      name: EDITORIAL_DELIVERY_TOOL,
+      input: {
+        response: 'Prose.',
+        usedFundEntryIds: ['other'],
+        sectionComplete: false,
+        sectionSummary: 'A compact memory.',
+      },
+    }], ['entry']),
+    /was not offered/
+  );
+});
+
+test('delivery extraction requires a nonempty private section summary', () => {
+  assert.throws(
+    () => extractEditorialDelivery([{
+      type: 'tool_use',
+      name: EDITORIAL_DELIVERY_TOOL,
+      input: { response: 'Prose.', usedFundEntryIds: [], sectionComplete: false },
+    }], []),
+    /sectionSummary is invalid/
+  );
+});
+
+test('spine-only delivery tool requires an empty use array', () => {
+  const tool = buildEditorialDeliveryTool([]);
+  assert.equal(tool.input_schema.properties.usedFundEntryIds.maxItems, 0);
+  assert.ok(tool.input_schema.required.includes('sectionSummary'));
+});
+
+test('prior-section memory is compact, ordered, and excludes the current section', () => {
+  const raw = [
+    { sectionIndex: 2, title: 'Third', summary: 'Third memory.' },
+    { sectionIndex: 0, title: 'First', summary: ' First memory. ' },
+    { sectionIndex: 1, title: 'Current', summary: 'Must be excluded.' },
+    { sectionIndex: 0, title: 'Duplicate', summary: 'Must also be excluded.' },
+    { sectionIndex: -1, title: 'Invalid', summary: 'Invalid.' },
+  ];
+  assert.deepEqual(normalizePriorSectionSummaries(raw, 1), [
+    { sectionIndex: 0, title: 'First', summary: 'First memory.' },
+    { sectionIndex: 2, title: 'Third', summary: 'Third memory.' },
+  ]);
+  const formatted = formatPriorSectionSummaries(raw, 1);
+  assert.match(formatted, /Section 1 — First: First memory\./);
+  assert.match(formatted, /Section 3 — Third: Third memory\./);
+  assert.doesNotMatch(formatted, /Must be excluded/);
+});
+
+test('reader-shaped reading offers accepted fund entries but not candidates', () => {
+  const sectionPackage = loadEditorialSection({ rootDir: ROOT, textId: 'fixture', sectionIndex: 4 });
+  sectionPackage.fundEntries[0].status = 'accepted';
+  const reading = prepareVersionedReading({ sectionPackage });
+  assert.deepEqual(reading.offeredFundEntryIds, ['entry-one']);
+  assert.match(reading.fundText, /entry-one/);
+  assert.doesNotMatch(reading.fundText, /entry-three/);
+});

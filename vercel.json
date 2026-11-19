@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/chat.js": {
+      "includeFiles": "api/editorial-seed/**"
+    },
+    "api/evolve.js": {
+      "includeFiles": "api/editorial-seed/**"
+    }
+  }
+}

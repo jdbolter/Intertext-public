@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "works": [
+    {
+      "id": "example",
+      "title": "How a Map Argues (example text)",
+      "order": 1,
+      "sections": [
+        {
+          "id": "a-map-is-a-choice",
+          "title": "A Map Is a Choice",
+          "order": 1,
+          "package": "sections/a-map-is-a-choice/section.json",
+          "readiness": "packaged",
+          "packageUrl": "data/example/a-map-is-a-choice.json",
+          "versionId": "ex-a-map-is-a-choice-v001",
+          "passageCount": 3,
+          "fundCounts": {
+            "candidate": 0,
+            "accepted": 0,
+            "superseded": 0,
+            "rejected": 0
+          }
+        },
+        {
+          "id": "the-scale-of-truth",
+          "title": "The Scale of Truth",
+          "order": 2,
+          "package": "sections/the-scale-of-truth/section.json",
+          "readiness": "packaged",
+          "packageUrl": "data/example/the-scale-of-truth.json",
+          "versionId": "ex-the-scale-of-truth-v001",
+          "passageCount": 3,
+          "fundCounts": {
+            "candidate": 0,
+            "accepted": 0,
+            "superseded": 0,
+            "rejected": 0
+          }
+        },
+        {
+          "id": "borders-that-are-not-there",
+          "title": "Borders That Are Not There",
+          "order": 3,
+          "package": "sections/borders-that-are-not-there/section.json",
+          "readiness": "packaged",
+          "packageUrl": "data/example/borders-that-are-not-there.json",
+          "versionId": "ex-borders-that-are-not-there-v001",
+          "passageCount": 3,
+          "fundCounts": {
+            "candidate": 0,
+            "accepted": 0,
+            "superseded": 0,
+            "rejected": 0
+          }
+        },
+        {
+          "id": "the-map-that-changes-the-territory",
+          "title": "The Map That Changes the Territory",
+          "order": 4,
+          "package": "sections/the-map-that-changes-the-territory/section.json",
+          "readiness": "packaged",
+          "packageUrl": "data/example/the-map-that-changes-the-territory.json",
+          "versionId": "ex-the-map-that-changes-the-territory-v001",
+          "passageCount": 3,
+          "fundCounts": {
+            "candidate": 0,
+            "accepted": 0,
+            "superseded": 0,
+            "rejected": 0
+          }
+        }
+      ]
+    }
+  ]
+}

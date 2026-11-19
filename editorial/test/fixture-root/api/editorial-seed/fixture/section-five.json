@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "workId": "fixture",
+  "sectionId": "section-five",
+  "sectionOrder": 5,
+  "title": "Section Five",
+  "editionId": "fixture",
+  "versionId": "section-five-v001",
+  "parentVersionId": null,
+  "createdAt": "2026-09-13T00:00:00Z",
+  "source": {
+    "type": "authored",
+    "path": "example/source_texts/sections/section-5.md"
+  },
+  "spine": [
+    {
+      "id": "section-five-p01",
+      "markdown": "Synthetic passage 1 of section five. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-five-p02",
+      "markdown": "Synthetic passage 2 of section five. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-five-p03",
+      "markdown": "Synthetic passage 3 of section five. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-five-p04",
+      "markdown": "Synthetic passage 4 of section five. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-five-p05",
+      "markdown": "Synthetic passage 5 of section five. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-five-p06",
+      "markdown": "Synthetic passage 6 of section five. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-five-p07",
+      "markdown": "Synthetic passage 7 of section five. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-five-p08",
+      "markdown": "Synthetic passage 8 of section five. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-five-p09",
+      "markdown": "Synthetic passage 9 of section five. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-five-p10",
+      "markdown": "Synthetic passage 10 of section five. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    }
+  ],
+  "fundEntries": [
+    {
+      "id": "entry-one",
+      "title": "Synthetic entry 1",
+      "anchors": [
+        "section-five-p02"
+      ],
+      "kind": "clarification",
+      "status": "candidate",
+      "useWhen": "Use when a test asks for it.",
+      "thread": null,
+      "sourceStatus": "not-required",
+      "sources": [],
+      "provenance": {
+        "type": "synthetic-reader",
+        "sessionId": "2026-09-12T18-55-01-898Z",
+        "turns": [
+          1,
+          2
+        ],
+        "artifactPath": "editorial/content/fixture/provenance/transcript.md"
+      },
+      "markdown": "Synthetic fund entry 1. It has no meaning beyond giving the tests an entry to select, promote or supersede."
+    },
+    {
+      "id": "entry-two",
+      "title": "Synthetic entry 2",
+      "anchors": [
+        "section-five-p02"
+      ],
+      "kind": "qualification",
+      "status": "candidate",
+      "useWhen": "Use when a test asks for it.",
+      "thread": null,
+      "sourceStatus": "needs-verification",
+      "sources": [],
+      "provenance": {
+        "type": "synthetic-reader",
+        "sessionId": "2026-09-12T18-55-01-898Z",
+        "turns": [
+          4
+        ],
+        "artifactPath": "editorial/content/fixture/provenance/transcript.md"
+      },
+      "markdown": "Synthetic fund entry 2. It has no meaning beyond giving the tests an entry to select, promote or supersede."
+    },
+    {
+      "id": "entry-three",
+      "title": "Synthetic entry 3",
+      "anchors": [
+        "section-five-p03"
+      ],
+      "kind": "example",
+      "status": "candidate",
+      "useWhen": "Use when a test asks for it.",
+      "thread": null,
+      "sourceStatus": "needs-verification",
+      "sources": [],
+      "provenance": {
+        "type": "synthetic-reader",
+        "sessionId": "2026-09-12T18-55-01-898Z",
+        "turns": [
+          4
+        ],
+        "artifactPath": "editorial/content/fixture/provenance/transcript.md"
+      },
+      "markdown": "Synthetic fund entry 3. It has no meaning beyond giving the tests an entry to select, promote or supersede."
+    },
+    {
+      "id": "entry-four",
+      "title": "Synthetic entry 4",
+      "anchors": [
+        "section-five-p01",
+        "section-five-p07"
+      ],
+      "kind": "qualification",
+      "status": "candidate",
+      "useWhen": "Use when a test asks for it.",
+      "thread": null,
+      "sourceStatus": "not-required",
+      "sources": [],
+      "provenance": {
+        "type": "synthetic-reader",
+        "sessionId": "2026-09-12T18-55-01-898Z",
+        "turns": [
+          2
+        ],
+        "artifactPath": "editorial/content/fixture/provenance/transcript.md"
+      },
+      "markdown": "Synthetic fund entry 4. It has no meaning beyond giving the tests an entry to select, promote or supersede."
+    }
+  ],
+  "changeSummary": "Frozen synthetic package used only by the tests."
+}

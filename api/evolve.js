@@ -1,0 +1,248 @@
+const Anthropic = require('@anthropic-ai/sdk');
+const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
+const { evolveEditorialSection } = require('./_lib/editorial-evolution');
+const { editorialModel, textModel, thinkingOff } = require('./_lib/text-extras');
+const { citationMarkersOn, loadReferences, plainCitations } = require('./_lib/citations');
+const { formatSpine } = require('./_lib/editorial-package');
+const {
+  ensureSectionInitialized,
+  loadCurrentSection,
+  publishSectionVersion,
+} = require('./_lib/editorial-store');
+
+const client = new Anthropic();
+
+const ALLOWED_TEXT_IDS = ['example'];
+const configCache = {};
+const sectionCache = {};
+
+function getConfig(textId) {
+  if (!configCache[textId]) {
+    configCache[textId] = require(path.join(process.cwd(), textId, 'config.js'));
+  }
+  return configCache[textId];
+}
+
+function getSections(textId) {
+  if (!sectionCache[textId]) {
+    const config = getConfig(textId);
+    sectionCache[textId] = config.sectionFiles.map(file =>
+      fs.readFileSync(path.join(config.sectionsDir, file), 'utf8')
+    );
+  }
+  return sectionCache[textId];
+}
+
+const EVOLVED_PATH = path.join(process.cwd(), 'evolved_sections.json');
+
+function getRedis() {
+  const { Redis } = require('@upstash/redis');
+  return new Redis({ url: process.env.KV_REST_API_URL, token: process.env.KV_REST_API_TOKEN });
+}
+
+async function readEvolved(textId) {
+  if (process.env.KV_REST_API_URL) {
+    try {
+      return (await getRedis().get(`evolved:${textId}`)) || {};
+    } catch (err) {
+      console.error('KV read failed:', err.message);
+      return {};
+    }
+  }
+  try {
+    const all = JSON.parse(fs.readFileSync(EVOLVED_PATH, 'utf8'));
+    return all[textId] || {};
+  } catch {
+    return {};
+  }
+}
+
+async function writeEvolved(textId, data) {
+  if (process.env.KV_REST_API_URL) {
+    await getRedis().set(`evolved:${textId}`, data);
+    return;
+  }
+  try {
+    let all = {};
+    try { all = JSON.parse(fs.readFileSync(EVOLVED_PATH, 'utf8')); } catch {}
+    all[textId] = data;
+    fs.writeFileSync(EVOLVED_PATH, JSON.stringify(all, null, 2));
+  } catch (err) {
+    console.error('writeEvolved failed:', err.message);
+  }
+}
+
+module.exports = async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  const { sectionIndex, conversationHistory, textId, dryRun, sessionId, baseVersionId } = req.body;
+  const isDryRun = dryRun === true;
+
+  if (!ALLOWED_TEXT_IDS.includes(textId)) {
+    return res.status(400).json({ error: 'Unknown text' });
+  }
+
+  if (typeof sectionIndex !== 'number' || !Array.isArray(conversationHistory)) {
+    return res.status(400).json({ error: 'Invalid request body' });
+  }
+
+  const config = getConfig(textId);
+  const sections = getSections(textId);
+  const idx = Math.max(0, Math.min(Math.floor(sectionIndex), sections.length - 1));
+
+  if (!isDryRun) {
+    try {
+      const initialized = await ensureSectionInitialized({ textId, sectionIndex: idx });
+      if (initialized) {
+        const contributionSessionId = typeof sessionId === 'string' && sessionId.trim()
+          ? sessionId.trim()
+          : `anonymous-${crypto.randomUUID()}`;
+
+        for (let attempt = 0; attempt < 2; attempt += 1) {
+          const current = attempt === 0
+            ? initialized
+            : await loadCurrentSection({ textId, sectionIndex: idx });
+          const currentPackage = current.sectionPackage;
+          const result = await evolveEditorialSection({
+            client,
+            sectionPackage: currentPackage,
+            conversationHistory,
+            sessionId: contributionSessionId,
+            // H-011: a text that reads by markers also evolves on its own model, by checked JSON.
+            model: config.editorialDelivery === 'markers' ? textModel(config) : editorialModel(config),
+            structured: config.editorialDelivery === 'markers' ? 'json' : 'tool',
+          });
+
+          if (!result.changed) {
+            const currentText = formatSpine(currentPackage);
+            return res.status(200).json({
+              revised: currentText,
+              original: currentText,
+              editorial: {
+                updated: false,
+                versionId: currentPackage.versionId,
+                reason: result.proposal?.decision || result.review?.decision || 'no-change',
+              },
+            });
+          }
+
+          const updateRecord = {
+            schemaVersion: 1,
+            updateId: result.updateId,
+            sessionId: contributionSessionId,
+            workId: currentPackage.workId,
+            sectionId: currentPackage.sectionId,
+            readerBaseVersionId: typeof baseVersionId === 'string' ? baseVersionId : null,
+            parentVersionId: currentPackage.versionId,
+            versionId: result.nextPackage.versionId,
+            createdAt: result.nextPackage.createdAt,
+            conversationHistory,
+            proposal: result.proposal,
+            review: result.review,
+          };
+          const published = await publishSectionVersion({
+            currentPackage,
+            nextPackage: result.nextPackage,
+            updateRecord,
+            updateId: result.updateId,
+          });
+          if (published.published) {
+            return res.status(200).json({
+              original: formatSpine(currentPackage),
+              revised: formatSpine(result.nextPackage),
+              editorial: {
+                updated: true,
+                previousVersionId: currentPackage.versionId,
+                versionId: result.nextPackage.versionId,
+                changeSummary: result.nextPackage.changeSummary,
+              },
+            });
+          }
+        }
+        return res.status(409).json({ error: 'The section changed concurrently; please retry the contribution' });
+      }
+    } catch (err) {
+      console.error(`Editorial evolution failed for ${textId}[${idx}]:`, err);
+      return res.status(500).json({ error: 'Editorial update failed, nothing saved' });
+    }
+  }
+
+  // A dry run (synthetic-reader's evolve preview — see synthetic-reader/lib/evolveClient.js)
+  // never reads or writes KV at all: it always starts from the pristine authored text,
+  // regardless of what real readers may have already evolved it into, so that repeated
+  // synthetic runs are comparable against the same fixed baseline instead of a moving
+  // target. It must never persist anything — see the isDryRun guard near the bottom.
+  const evolved = isDryRun ? {} : await readEvolved(textId);
+  const currentText = isDryRun ? sections[idx] : (evolved[idx] ?? sections[idx]);
+
+  // H-007: the voice is named as the text names it (example: "Text"), and any
+  // citation markers still in the history become the book's author-date style.
+  const voiceName = typeof config.voiceName === 'string' && config.voiceName.trim() ? config.voiceName.trim() : 'Guide';
+  const references = citationMarkersOn(config) ? loadReferences(config) : null;
+  const conversationTranscript = conversationHistory
+    .map(m => {
+      const content = references ? plainCitations(m.content, references) : m.content;
+      return `${m.role === 'user' ? 'Reader' : voiceName}: ${content}`;
+    })
+    .join('\n\n');
+
+  try {
+    const originalWords = sections[idx].split(/\s+/).filter(Boolean).length;
+    const wordLimit = Math.round(originalWords * 1.3);
+    const systemPrompt = config.synthesisInstructions.replace('{{WORD_LIMIT}}', wordLimit);
+    // Budget must cover the full revised section as plain text; this is a rewrite
+    // task with no need for extended reasoning, so thinking is disabled rather than
+    // left to consume part of a fixed max_tokens budget (Sonnet 5 defaults to
+    // adaptive thinking when the param is omitted). A 2x words-to-tokens multiplier
+    // measured short in practice (quotes, em-dashes, and contractions push English
+    // prose past ~1.3 tokens/word) and let a real response get cut off mid-sentence
+    // while still passing the length-only check below — hence the wider margin here
+    // and the completeness check on the result.
+    const maxTokens = Math.min(8192, Math.round(wordLimit * 4));
+
+    const response = await client.messages.create({
+      // H-007: the text's model (claude-sonnet-5-5 by default), with thinking off in that
+      // model's own way.
+      model: textModel(config),
+      max_tokens: maxTokens,
+      thinking: thinkingOff(textModel(config)),
+      system: systemPrompt,
+      messages: [
+        {
+          role: 'user',
+          content: `Current section text:\n\n${currentText}\n\n---\n\nConversation:\n\n${conversationTranscript}\n\n---\n\nProduce the revised section.`
+        }
+      ]
+    });
+
+    const revised = response.content
+      .filter(b => b.type === 'text')
+      .map(b => b.text)
+      .join('')
+      .trim();
+
+    // Guard against ever overwriting a good section with a failed/truncated/refused
+    // response — this must never silently persist, since evolved[idx] is treated as
+    // authoritative over the original file once set (see the `??` fallback below).
+    // Word count alone doesn't catch a response cut off mid-sentence by max_tokens —
+    // that can still be longer than the original, so also require a clean ending.
+    const revisedWords = revised.split(/\s+/).filter(Boolean).length;
+    const endsCleanly = /[.!?]['"’”)]*$/.test(revised);
+    if (revisedWords < originalWords || !endsCleanly) {
+      console.error(`evolve produced invalid output for ${textId}[${idx}]: ${revisedWords} words vs ${originalWords} original, endsCleanly=${endsCleanly}`);
+      return res.status(502).json({ error: 'Synthesis failed, nothing saved' });
+    }
+
+    if (!isDryRun) {
+      evolved[idx] = revised;
+      await writeEvolved(textId, evolved);
+    }
+
+    return res.status(200).json({ revised, original: currentText });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'API error' });
+  }
+};

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "editionId": "example",
+  "versionId": "ex-the-scale-of-truth-v001",
+  "parentVersionId": null,
+  "createdAt": "2026-11-19T00:00:00Z",
+  "source": {
+    "type": "authored",
+    "path": "example/source_texts/sections/section-2.md"
+  },
+  "spineFile": "spine.md",
+  "fundEntries": [],
+  "changeSummary": "Structural package of the example text: one passage per paragraph, no prose changes and no initial fund entries."
+}

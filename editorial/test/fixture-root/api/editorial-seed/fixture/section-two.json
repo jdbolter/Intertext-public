@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "workId": "fixture",
+  "sectionId": "section-two",
+  "sectionOrder": 2,
+  "title": "Section Two",
+  "editionId": "fixture",
+  "versionId": "section-two-v001",
+  "parentVersionId": null,
+  "createdAt": "2026-09-22T00:00:00Z",
+  "source": {
+    "type": "authored",
+    "path": "example/source_texts/sections/section-2.md"
+  },
+  "spine": [
+    {
+      "id": "section-two-p01",
+      "markdown": "Synthetic passage 1 of section two. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-two-p02",
+      "markdown": "Synthetic passage 2 of section two. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-two-p03",
+      "markdown": "Synthetic passage 3 of section two. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-two-p04",
+      "markdown": "Synthetic passage 4 of section two. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-two-p05",
+      "markdown": "Synthetic passage 5 of section two. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-two-p06",
+      "markdown": "Synthetic passage 6 of section two. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-two-p07",
+      "markdown": "Synthetic passage 7 of section two. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-two-p08",
+      "markdown": "Synthetic passage 8 of section two. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    }
+  ],
+  "fundEntries": [],
+  "changeSummary": "Frozen synthetic package used only by the tests."
+}

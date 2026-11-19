@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "workId": "fixture",
+  "sectionId": "section-three",
+  "sectionOrder": 3,
+  "title": "Section Three",
+  "editionId": "fixture",
+  "versionId": "section-three-v001",
+  "parentVersionId": null,
+  "createdAt": "2026-09-22T00:00:00Z",
+  "source": {
+    "type": "authored",
+    "path": "example/source_texts/sections/section-3.md"
+  },
+  "spine": [
+    {
+      "id": "section-three-p01",
+      "markdown": "Synthetic passage 1 of section three. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-three-p02",
+      "markdown": "Synthetic passage 2 of section three. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    }
+  ],
+  "fundEntries": [],
+  "changeSummary": "Frozen synthetic package used only by the tests."
+}

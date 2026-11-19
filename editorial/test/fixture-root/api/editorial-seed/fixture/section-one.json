@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "workId": "fixture",
+  "sectionId": "section-one",
+  "sectionOrder": 1,
+  "title": "Section One",
+  "editionId": "fixture",
+  "versionId": "section-one-v001",
+  "parentVersionId": null,
+  "createdAt": "2026-09-22T00:00:00Z",
+  "source": {
+    "type": "authored",
+    "path": "example/source_texts/sections/section-1.md"
+  },
+  "spine": [
+    {
+      "id": "section-one-p01",
+      "markdown": "Synthetic passage 1 of section one. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-one-p02",
+      "markdown": "Synthetic passage 2 of section one. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-one-p03",
+      "markdown": "Synthetic passage 3 of section one. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    },
+    {
+      "id": "section-one-p04",
+      "markdown": "Synthetic passage 4 of section one. It has no meaning beyond giving the tests a passage to anchor to and to change."
+    }
+  ],
+  "fundEntries": [],
+  "changeSummary": "Frozen synthetic package used only by the tests."
+}

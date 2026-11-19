@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "workId": "example",
+  "sectionId": "the-scale-of-truth",
+  "sectionOrder": 2,
+  "title": "The Scale of Truth",
+  "editionId": "example",
+  "versionId": "ex-the-scale-of-truth-v001",
+  "parentVersionId": null,
+  "createdAt": "2026-11-19T00:00:00Z",
+  "source": {
+    "type": "authored",
+    "path": "example/source_texts/sections/section-2.md"
+  },
+  "spine": [
+    {
+      "id": "the-scale-of-truth-p01",
+      "markdown": "Scale is the choice that decides all the others. On a map of a whole country a village is a dot or nothing; on a map of the village each house has an outline. Every scale permits some statements and forbids others, and a reader who moves between scales is moving between kinds of claim, not merely between degrees of detail."
+    },
+    {
+      "id": "the-scale-of-truth-p02",
+      "markdown": "Borges imagined an empire whose cartographers, dissatisfied with every map, made one the size of the empire, matching it point for point, and whose heirs found it useless. The joke is exact: a map that kept everything would answer no question, because answering a question requires leaving most things out."
+    },
+    {
+      "id": "the-scale-of-truth-p03",
+      "markdown": "A map’s omissions are therefore its method and not its failing. The failing, where there is one, lies in hiding that a choice was made, in presenting the drawing as if the ground had drawn itself."
+    }
+  ],
+  "fundEntries": [],
+  "changeSummary": "Structural package of the example text: one passage per paragraph, no prose changes and no initial fund entries."
+}

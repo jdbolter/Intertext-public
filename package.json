@@ -1,0 +1,28 @@
+{
+  "name": "intertext",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env.local node_modules/vercel/dist/vc.js dev",
+    "editorial-build": "node editorial/build-data.js",
+    "editorial-preview": "npm run editorial-build && node --env-file-if-exists=.env.local editorial/serve.js",
+    "editorial-kv": "node --env-file-if-exists=.env.local editorial/kv-admin.js",
+    "editorial-propose": "node --env-file-if-exists=.env.local editorial/propose-session.js",
+    "synthetic-reader": "node --env-file-if-exists=.env.local synthetic-reader/cli.js",
+    "synthetic-reader-evolve": "node --env-file-if-exists=.env.local synthetic-reader/evolve-cli.js",
+    "test": "node --test synthetic-reader/test/*.test.js editorial/test/*.test.js scripts/test/*.test.js",
+    "check-models": "node --env-file-if-exists=.env.local scripts/check-models.js",
+    "evolved": "node --env-file-if-exists=.env.local scripts/evolved.js",
+    "media": "node scripts/media.js",
+    "reading-report": "node scripts/reading-report.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@upstash/redis": "^1.38.0",
+    "openai": "^5.23.2",
+    "vercel": "^66.2.0"
+  },
+  "devDependencies": {
+    "ajv": "^8.6.3"
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "works": [
+    {
+      "id": "fixture",
+      "title": "Fixture work",
+      "order": 1,
+      "sections": [
+        {
+          "id": "section-one",
+          "title": "Section One",
+          "order": 1,
+          "package": "sections/section-one/section.json",
+          "readiness": "packaged",
+          "packageUrl": "data/fixture/section-one.json",
+          "versionId": "section-one-v001",
+          "passageCount": 4,
+          "fundCounts": {
+            "candidate": 0,
+            "accepted": 0,
+            "superseded": 0,
+            "rejected": 0
+          }
+        },
+        {
+          "id": "section-two",
+          "title": "Section Two",
+          "order": 2,
+          "package": "sections/section-two/section.json",
+          "readiness": "packaged",
+          "packageUrl": "data/fixture/section-two.json",
+          "versionId": "section-two-v001",
+          "passageCount": 8,
+          "fundCounts": {
+            "candidate": 0,
+            "accepted": 0,
+            "superseded": 0,
+            "rejected": 0
+          }
+        },
+        {
+          "id": "section-three",
+          "title": "Section Three",
+          "order": 3,
+          "package": "sections/section-three/section.json",
+          "readiness": "packaged",
+          "packageUrl": "data/fixture/section-three.json",
+          "versionId": "section-three-v001",
+          "passageCount": 2,
+          "fundCounts": {
+            "candidate": 0,
+            "accepted": 0,
+            "superseded": 0,
+            "rejected": 0
+          }
+        },
+        {
+          "id": "section-four",
+          "title": "Section Four",
+          "order": 4,
+          "package": "sections/section-four/section.json",
+          "readiness": "packaged",
+          "packageUrl": "data/fixture/section-four.json",
+          "versionId": "section-four-v001",
+          "passageCount": 7,
+          "fundCounts": {
+            "candidate": 0,
+            "accepted": 0,
+            "superseded": 0,
+            "rejected": 0
+          }
+        },
+        {
+          "id": "section-five",
+          "title": "Section Five",
+          "order": 5,
+          "package": "sections/section-five/section.json",
+          "readiness": "packaged",
+          "packageUrl": "data/fixture/section-five.json",
+          "versionId": "section-five-v001",
+          "passageCount": 10,
+          "fundCounts": {
+            "candidate": 4,
+            "accepted": 0,
+            "superseded": 0,
+            "rejected": 0
+          }
+        }
+      ]
+    }
+  ]
+}

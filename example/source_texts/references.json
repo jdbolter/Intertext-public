@@ -1,0 +1,23 @@
+{
+  "borges-1946": {
+    "short": "Borges 1946",
+    "full": "Borges, Jorge Luis. 1998. “On Exactitude in Science.” In <i>Collected Fictions</i>, translated by Andrew Hurley. New York: Penguin. First published 1946.",
+    "pages": [],
+    "mention": "introduce",
+    "intro": "the Argentine writer Jorge Luis Borges",
+    "name": "Borges"
+  },
+  "harley-1989": {
+    "short": "Harley 1989",
+    "full": "Harley, J. B. 1989. “Deconstructing the Map.” <i>Cartographica</i> 26 (2): 1–20.",
+    "pages": [
+      [
+        1,
+        2
+      ]
+    ],
+    "mention": "introduce",
+    "intro": "the geographer J. B. Harley",
+    "name": "Harley"
+  }
+}

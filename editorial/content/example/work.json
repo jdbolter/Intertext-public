@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "example",
+  "title": "How a Map Argues (example text)",
+  "order": 1,
+  "sections": [
+    {
+      "id": "a-map-is-a-choice",
+      "title": "A Map Is a Choice",
+      "order": 1,
+      "package": "sections/a-map-is-a-choice/section.json"
+    },
+    {
+      "id": "the-scale-of-truth",
+      "title": "The Scale of Truth",
+      "order": 2,
+      "package": "sections/the-scale-of-truth/section.json"
+    },
+    {
+      "id": "borders-that-are-not-there",
+      "title": "Borders That Are Not There",
+      "order": 3,
+      "package": "sections/borders-that-are-not-there/section.json"
+    },
+    {
+      "id": "the-map-that-changes-the-territory",
+      "title": "The Map That Changes the Territory",
+      "order": 4,
+      "package": "sections/the-map-that-changes-the-territory/section.json"
+    }
+  ]
+}
