@@ -23,8 +23,8 @@ function normalize(text) {
 
 test('all editorial work manifests match the current text configs', () => {
   const discovered = discoverWorks(contentRoot);
-  assert.deepEqual(discovered.map(({ work }) => work.id), ['example']);
-  assert.deepEqual(discovered.map(({ work }) => work.order), [1]);
+  assert.deepEqual(discovered.map(({ work }) => work.id), ['example', 'intertext-paper']);
+  assert.deepEqual(discovered.map(({ work }) => work.order), [1, 2]);
 
   for (const { work } of discovered) {
     const config = require(path.join(root, work.id, 'config.js'));
@@ -65,8 +65,11 @@ test('buildAll writes a portable editor index and validated section snapshot', (
   const outputRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'intertext-editorial-'));
   try {
     const index = buildAll({ contentRoot, outputRoot });
-    assert.equal(index.works.length, 1);
-    assert.equal(index.works.flatMap(work => work.sections).length, 4);
+    assert.equal(index.works.length, 2);
+    assert.equal(index.works.flatMap(work => work.sections).length, 10);
+    const paper = index.works.find(work => work.id === 'intertext-paper');
+    assert.ok(paper.sections.every(section => section.readiness === 'packaged'));
+    assert.equal(paper.sections.reduce((n, section) => n + section.fundCounts.accepted, 0), 34);
     const proofs = index.works.find(work => work.id === 'example');
     assert.ok(proofs.sections.every(section => section.readiness === 'packaged'));
     assert.ok(proofs.sections.every(section => section.fundCounts.accepted === 0 && section.fundCounts.candidate === 0));
@@ -77,14 +80,15 @@ test('buildAll writes a portable editor index and validated section snapshot', (
   }
 });
 
-test('reader home page offers the example text', () => {
+test('reader home page offers the paper, then the example text', () => {
   const homepage = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-  const cards = [...homepage.matchAll(/<a class="card" href="([^"]+)"/g)].map(m => m[1]);
-  assert.deepEqual(cards, ['example/public/index.html']);
+  const cards = [...homepage.matchAll(/<a class="[^"]*\bcard\b[^"]*" href="([^"]+)"/g)].map(m => m[1]);
+  assert.deepEqual(cards, ['intertext-paper/public/index.html', 'example/public/index.html']);
+  for (const href of cards) assert.ok(fs.existsSync(path.join(root, href)), href);
 });
 
 test('public readers carry compact cross-section memory and restore per-section history', () => {
-  for (const workId of ['example']) {
+  for (const workId of ['example', 'intertext-paper']) {
     const app = fs.readFileSync(path.join(root, workId, 'public', 'app.js'), 'utf8');
     const style = fs.readFileSync(path.join(root, workId, 'public', 'style.css'), 'utf8');
     assert.match(app, /const sectionSummaries = new Map\(\)/);
@@ -170,3 +174,73 @@ test('example: every section is packaged without changing its authored prose', (
     assert.deepEqual(sectionPackage.fundEntries, []);
   }
 });
+
+// The DH2027 paper that describes InterText, as an InterText.
+for (const textId of ['intertext-paper']) {
+  test(`${textId}: the introductions and chapters the page shows match config.js`, () => {
+    const config = require(path.join(root, textId, 'config.js'));
+    const app = fs.readFileSync(path.join(root, textId, 'public', 'app.js'), 'utf8');
+    const slice = name => app.slice(app.indexOf(`const ${name} = `), app.indexOf('];', app.indexOf(`const ${name} = `)) + 2);
+    const shown = [...slice('SECTION_INTROS').matchAll(/`([\s\S]*?)`/g)].map(m => m[1]);
+    const plain = s => s
+      .replace(/<[^>]+>/g, '')
+      .replace(/&mdash;/g, '—').replace(/&rsquo;/g, '’').replace(/&lsquo;/g, '‘')
+      .replace(/&ldquo;/g, '“').replace(/&rdquo;/g, '”').replace(/&amp;/g, '&')
+      .replace(/[’‘]/g, "'").replace(/[“”]/g, '"')
+      .replace(/\s+/g, ' ').trim();
+    assert.equal(shown.length, config.sectionIntros.length);
+    shown.forEach((html, i) => assert.equal(plain(html), plain(config.sectionIntros[i]), `section ${i + 1} introduction`));
+    const chapters = new Function(`${slice('CHAPTERS')}; return CHAPTERS;`)();
+    assert.deepEqual(chapters, config.chapters.map(({ number, title, firstSection, label }) => (label ? { number, title, firstSection, label } : { number, title, firstSection })));
+    assert.ok(config.chapters.every(ch => typeof ch.point === 'string' && ch.point.trim()));
+    assert.equal(config.sectionPoints.length, config.sectionNames.length);
+    const titles = new Function(`${slice('SECTION_TITLES')}; return SECTION_TITLES;`)();
+    assert.deepEqual(titles, config.sectionNames);
+    const numerals = new Function(`${slice('SECTION_NUMERALS')}; return SECTION_NUMERALS;`)();
+    assert.equal(numerals.length, config.sectionNames.length);
+  });
+
+  test(`${textId}: every image the model may embed is on the page and in the images folder`, () => {
+    const config = require(path.join(root, textId, 'config.js'));
+    const app = fs.readFileSync(path.join(root, textId, 'public', 'app.js'), 'utf8');
+    const ids = config.sectionImagePrompts.flatMap(list => (list || []).map(item => item.id));
+    assert.ok(ids.length > 0);
+    for (const id of ids) {
+      const m = app.match(new RegExp(`id: "${id}", src: "\\.\\./images/([^"]+)"`));
+      assert.ok(m, `${id} is on the page`);
+      assert.ok(fs.existsSync(path.join(root, textId, 'images', m[1])), `${m[1]} exists`);
+    }
+  });
+
+  test(`${textId}: the spine is the paper, passage for passage`, () => {
+    const config = require(path.join(root, textId, 'config.js'));
+    const work = JSON.parse(fs.readFileSync(path.join(contentRoot, textId, 'work.json'), 'utf8'));
+    work.sections.forEach((section, i) => {
+      const file = fs.readFileSync(path.join(config.sectionsDir, config.sectionFiles[i]), 'utf8').replace(/^## .*\n/, '');
+      const spine = fs.readFileSync(path.join(contentRoot, textId, 'sections', section.id, 'spine.md'), 'utf8')
+        .replace(/<!-- intertext:passage [a-z0-9-]+ -->/g, '');
+      assert.equal(normalize(spine), normalize(file), section.id);
+    });
+  });
+}
+
+// Titles a reply sets *between asterisks* appear in italics, on both reader's pages.
+for (const textId of ['example', 'intertext-paper']) {
+  test(`${textId}: a reply's *italics* and [links](url) are rendered, and a lone asterisk is left alone`, () => {
+    const app = fs.readFileSync(path.join(root, textId, 'public', 'app.js'), 'utf8');
+    const start = app.indexOf('const INLINE_MARKUP');
+    const end = app.indexOf('\n}\n', app.indexOf('function renderText')) + 2;
+    assert.ok(start > 0 && end > start);
+    class Node { constructor(tag) { this.tag = tag; this.kids = []; this.textContent = ''; } appendChild(c) { this.kids.push(c); } }
+    const document = { createTextNode: text => ({ text }), createElement: tag => new Node(tag) };
+    const renderText = new Function('document', `${app.slice(start, end)}; return renderText;`)(document);
+    const render = s => {
+      const p = new Node('p');
+      renderText(p, s);
+      return p.kids.map(k => (k.text !== undefined ? k.text : `<${k.tag}>${k.textContent}</${k.tag}>`)).join('');
+    };
+    assert.equal(render('what JAY-Z does in *Picasso Baby*, and'), 'what JAY-Z does in <em>Picasso Baby</em>, and');
+    assert.equal(render('[the site](https://example.org) and *Fantasia*'), '<a>the site</a> and <em>Fantasia</em>');
+    assert.equal(render('5 * 3 = 15'), '5 * 3 = 15');
+  });
+}

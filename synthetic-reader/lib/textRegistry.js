@@ -17,6 +17,14 @@ const TEXTS = {
     voiceLabel: 'Text',
     appJsPath: path.join(PROJECT_ROOT, 'example', 'public', 'app.js'),
   },
+  // The DH2027 paper that describes InterText, as an InterText.
+  'intertext-paper': {
+    id: 'intertext-paper',
+    displayTitle: 'InterText: An AI-supported system for interactive reading',
+    guideLabel: 'Guide',
+    voiceLabel: 'Text',
+    appJsPath: path.join(PROJECT_ROOT, 'intertext-paper', 'public', 'app.js'),
+  },
 };
 
 function listTextIds() {

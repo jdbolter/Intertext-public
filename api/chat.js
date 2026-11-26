@@ -44,7 +44,7 @@ function getClient() {
   return client;
 }
 
-const ALLOWED_TEXT_IDS = ['example'];
+const ALLOWED_TEXT_IDS = ['example', 'intertext-paper'];
 const configCache = {};
 const sectionCache = {};
 

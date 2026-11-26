@@ -1,7 +1,7 @@
 # How each prompt is built
 
 This document says what each call to a model contains, in what order, and which file supplies each part. It describes
-the `example` text (the real wording of the book the engine was built for is in `examples/digital-plenitude-prompts.md`). The prompt wording itself is not copied here: it lives in the files named below, so
+the `example` text; `intertext-paper` is built the same way from its own `config.js` and files (the real wording of the book the engine was built for is in `examples/digital-plenitude-prompts.md`). The prompt wording itself is not copied here: it lives in the files named below, so
 that it is read where it is edited. Part names such as `behavioralInstructions` are keys in `example/config.js`
 unless another file is named.
 

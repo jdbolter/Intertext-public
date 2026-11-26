@@ -14,7 +14,7 @@ const {
 
 const client = new Anthropic();
 
-const ALLOWED_TEXT_IDS = ['example'];
+const ALLOWED_TEXT_IDS = ['example', 'intertext-paper'];
 const configCache = {};
 const sectionCache = {};
 

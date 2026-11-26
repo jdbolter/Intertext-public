@@ -29,7 +29,7 @@ Open `http://localhost:3000/` for the landing page, or a text directly at `http:
 
 ```
 intertext/
-├── index.html                landing page (offers the example text)
+├── index.html                landing page (the paper first, the example beneath)
 ├── api/
 │   ├── chat.js               serverless function: one reading turn (config-driven by textId)
 │   ├── evolve.js             serverless function: a contributing reader's editorial update
@@ -39,18 +39,20 @@ intertext/
 ├── editorial/                spine-and-fund packages, schema, build, local author editor, KV tools
 ├── synthetic-reader/         CLI harness: a simulated reader drives /api/chat
 ├── scripts/                  reading-report, media lists, model check, evolved-store tool
+├── intertext-paper/          the DH2027 paper on InterText, as an InterText (config.js, source_texts/, public/, images/)
 ├── example/                  an invented example text (config.js, source_texts/, public/)
 ├── examples/                 the real prompts of the book the engine was built for
 ├── vercel.json  .vercelignore  package.json
 └── LICENSE
 ```
 
-A text folder holds `config.js` (everything specific to the text: sections, introductions, the voice's instructions, images), `source_texts/` (the section files the API loads), and `public/` (the reader's page). The example has its own page (running head, contents by chapter, citation notes and media items from `shared/`).
+A text folder holds `config.js` (everything specific to the text: sections, introductions, the voice's instructions, images), `source_texts/` (the section files the API loads), and `public/` (the reader's page). Each text has its own page (running head, contents by chapter, citation notes and media items from `shared/`); the two pages are copies of one page with each text's data, so a change to the page's look is made in both.
 
 ## The texts
 
 | textId | Work | Sections | Status |
 |---|---|---|---|
+| `intertext-paper` | *InterText: An AI-supported system for interactive reading*, the paper submitted to DH2027 | 6 | the main entry on the landing page; the paper is the spine, and 34 fund entries drawn from this documentation answer questions about how the system works; library lists from the paper's references; two figures |
 | `example` | *How a Map Argues*, a short invented essay | 4 | a worked example of every mechanism: revision pass, library lists and citations, chapters, spine and fund |
 
 
@@ -100,6 +102,6 @@ The engine deploys to Vercel; whatever branch the Vercel project tracks is what 
 
 ## Licence and provenance
 
-Code is released under the MIT licence (`LICENSE`). The documentation and the invented example text in `example/` are released under CC BY 4.0. The text of the book the engine was built for is not part of this repository; only its instruction prompts are reproduced, in `examples/`.
+Code is released under the MIT licence (`LICENSE`). The documentation, the paper and its fund in `intertext-paper/` and `editorial/content/intertext-paper/`, and the invented example text in `example/` are released under CC BY 4.0. The text of the book the engine was built for is not part of this repository; only its instruction prompts are reproduced, in `examples/`.
 
 Comments and documents sometimes cite tags such as `H-014`. These refer to the numbered change proposals of a private development log and are kept only as pointers; the code and documents are meant to be readable without them.
